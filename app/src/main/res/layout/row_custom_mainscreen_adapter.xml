@@ -3,40 +3,65 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    android:background="@color/surface"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:minHeight="72dp"
     android:id="@+id/contentRow">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="#ffffff">
+        android:layout_height="wrap_content"
+        android:minHeight="72dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/surface">
+        <FrameLayout
+            android:id="@+id/songIconTile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:background="@color/surfaceMuted">
+            <ImageView
+                android:id="@+id/songArtwork"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_song_note"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/music_note_description" />
+        </FrameLayout>
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true">
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/songIconTile"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="16dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#212121"
+                android:textColor="@color/textPrimary"
                 android:textStyle="normal"
                 android:textSize="17sp"
                 android:text="Stairway to Heaven"
                 android:paddingRight="9dp"
                 android:paddingBottom="-7dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="0dp"
                 android:id="@+id/trackTitle"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#bdbdbd"
+                android:textColor="@color/textSecondary"
                 android:text="The Smithies"
                 android:paddingRight="7dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="0dp"
                 android:layout_below="@+id/trackTitle"
                 android:id="@+id/trackArtist"/>
         </RelativeLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#e0e0e0"
+            android:background="@color/divider"
             android:layout_marginLeft="11dp"
             android:layout_marginRight="11dp"
             android:layout_alignParentBottom="true" />

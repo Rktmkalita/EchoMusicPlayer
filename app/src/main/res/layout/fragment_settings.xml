@@ -4,11 +4,11 @@
     android:orientation="vertical"
     android:paddingTop="11dp"
     android:clickable="true"
-    android:background="#ffffff">
+    android:background="@color/surface">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#212121"
+        android:textColor="@color/textPrimary"
         android:layout_marginLeft="20dp"
         android:text="Shake to change song"
         android:id="@+id/shaketochange"
@@ -19,11 +19,21 @@
         android:id="@+id/switchShake"
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
-        android:backgroundTint="#212121"/>
-    <view
+        android:buttonTint="@color/colorAccent"/>
+    <View
         android:layout_width="match_parent"
         android:layout_height="0.2dp"
         android:layout_margin="25dp"
         android:layout_below="@+id/shaketochange"
-        android:background="#bdbdbd"/>
+        android:background="@color/divider"/>
+    <Button
+        android:id="@+id/equalizerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/shaketochange"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:text="Equalizer"
+        android:textColor="@color/textPrimary" />
 </RelativeLayout>

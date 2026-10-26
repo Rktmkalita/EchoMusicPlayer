@@ -1,7 +1,7 @@
 package com.rktmkalita.echo.adapters
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,9 +29,9 @@ class NavigationDrawerAdapter(_contentList: ArrayList<String>, _getImages: IntAr
         this.getImage = _getImages
         this.mContext = _context
     }
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): NavViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NavViewHolder {
 
-        var itemView = LayoutInflater.from(parent?.context)
+        var itemView = LayoutInflater.from(parent.context)
                 .inflate(R.layout.row_custom_navigationdrawer, parent, false)
         val returnThis = NavViewHolder(itemView)
         return returnThis
@@ -41,7 +41,7 @@ class NavigationDrawerAdapter(_contentList: ArrayList<String>, _getImages: IntAr
         return contentList?.size as Int
     }
 
-    override fun onBindViewHolder(holder: NavViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: NavViewHolder, position: Int) {
         holder?.icon_GET?.setBackgroundResource(getImage?.get(position) as Int)
         holder?.text_GET?.setText(contentList?.get(position))
         holder?.contentHolder?.setOnClickListener({
@@ -75,14 +75,14 @@ class NavigationDrawerAdapter(_contentList: ArrayList<String>, _getImages: IntAr
         })
         }
 
-    class NavViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+    class NavViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var icon_GET: ImageView?=null
         var text_GET: TextView?=null
         var contentHolder: RelativeLayout?=null
         init {
-            icon_GET = itemView?.findViewById(R.id.icon_navdrawer)
-            text_GET = itemView?.findViewById(R.id.text_navdrawer)
-            contentHolder = itemView?.findViewById((R.id.navdrawer_item_content_holder))
+            icon_GET = itemView.findViewById(R.id.icon_navdrawer)
+            text_GET = itemView.findViewById(R.id.text_navdrawer)
+            contentHolder = itemView.findViewById(R.id.navdrawer_item_content_holder)
         }
     }
 

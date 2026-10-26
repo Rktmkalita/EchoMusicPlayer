@@ -2,13 +2,13 @@
     android:layout_width="match_parent"
     android:clickable="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#ffffff">
-    <android.support.v7.widget.RecyclerView
+    android:background="@color/surface">
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/favouriteRecycler"
         android:visibility="visible">
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/noFavourites"
         android:text="You have no favourites!"
-        android:textColor="#212121"
+        android:textColor="@color/textSecondary"
         android:layout_centerInParent="true"
         android:visibility="invisible"/>
 </RelativeLayout>

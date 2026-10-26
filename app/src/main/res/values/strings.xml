@@ -1,4 +1,5 @@
 <resources>
+    <string name="music_note_description">Music</string>
     <string name="app_name">Echo</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

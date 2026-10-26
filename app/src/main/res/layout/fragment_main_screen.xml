@@ -1,7 +1,7 @@
 <RelativeLayout android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:clickable="true"
+    android:background="@color/surface"
     android:id="@+id/content_main">
 
     <RelativeLayout
@@ -9,11 +9,11 @@
         android:layout_height="match_parent"
         android:id="@+id/visibleLayout">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/contentMain">
-        </android.support.v7.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:id="@+id/hiddenBarMainScreen"
             android:layout_alignParentBottom="true"
             android:visibility="invisible"
-            android:background="@color/colorPrimary">
+            android:background="@color/surfaceElevated">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
                 android:text="Now Playing"
                 android:id="@+id/nowPlaying"
                 android:layout_toRightOf="@+id/defaultMusic"
-                android:textColor="#bdbdbd"
+                android:textColor="@color/textSecondary"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="11dp"/>
             <TextView
@@ -59,7 +59,7 @@
                 android:maxWidth="160dp"
                 android:singleLine="true"
                 android:text="..."
-                android:textColor="#ffffff"
+                android:textColor="@color/textPrimary"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_alignLeft="@+id/nowPlaying"
                 android:layout_alignStart="@+id/nowPlaying"
@@ -69,7 +69,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff"
+        android:background="@color/surface"
         android:id="@+id/noSongs"
         android:visibility="invisible">
 
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="You do not have any songs at the moment"
-            android:textColor="#000000"/>
+            android:textColor="@color/textPrimary"/>
     </RelativeLayout>
 
 </RelativeLayout>

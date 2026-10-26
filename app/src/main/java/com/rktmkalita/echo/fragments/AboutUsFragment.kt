@@ -2,7 +2,7 @@ package com.rktmkalita.echo.fragments
 
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -16,11 +16,11 @@ import com.rktmkalita.echo.R
 class AboutUsFragment : Fragment() {
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_about_us, container, false)
-        activity.title = "About Us"
+        requireActivity().title = "About Us"
         return view
     }
 

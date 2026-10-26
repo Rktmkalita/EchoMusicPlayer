@@ -24,7 +24,8 @@ class EchoDatabase: SQLiteOpenHelper{
     }
 
     override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        p0?.execSQL("DROP TABLE IF EXISTS " + Staticated.TABLE_NAME)
+        onCreate(p0)
     }
 
     constructor(context: Context?, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int) : super(context, name, factory, version)
@@ -43,6 +44,7 @@ class EchoDatabase: SQLiteOpenHelper{
 
     fun queryDBList(): ArrayList<Songs>?{
         try {
+            _songList.clear()
             val db = this.readableDatabase
             val queryparams = "SELECT * FROM " + Staticated.TABLE_NAME
             var cSor = db.rawQuery(queryparams, null)
@@ -65,19 +67,12 @@ class EchoDatabase: SQLiteOpenHelper{
     }
 
     fun checkifIdExists(_id: Int): Boolean{
-        var storeId = -1090
         val db = this.readableDatabase
-        val queryparams = "SELECT * FROM " + Staticated.TABLE_NAME + " WHERE SongId = '$_id'"
-        val cSor = db.rawQuery(queryparams, null)
-        if (cSor.moveToFirst()){
-            do {
-                storeId = cSor.getInt(cSor.getColumnIndexOrThrow(Staticated.COLUMN_ID))
-            }while (cSor.moveToNext())
-        }else{
-            return false
-        }
+        val queryparams = "SELECT 1 FROM " + Staticated.TABLE_NAME + " WHERE " + Staticated.COLUMN_ID + " = ? LIMIT 1"
+        val cSor = db.rawQuery(queryparams, arrayOf(_id.toString()))
+        val exists = cSor.moveToFirst()
         cSor.close()
-        return storeId != -1090
+        return exists
     }
 
     fun deleteFavourite(_id: Int){

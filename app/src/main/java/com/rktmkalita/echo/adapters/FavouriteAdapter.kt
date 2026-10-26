@@ -2,21 +2,23 @@ package com.rktmkalita.echo.adapters
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.ImageView
+import android.media.MediaMetadataRetriever
 import com.rktmkalita.echo.R
 import com.rktmkalita.echo.Songs
 import com.rktmkalita.echo.fragments.SongPlayingFragment
 
 class FavouriteAdapter(_songDetails: ArrayList<Songs>, _context: Context): RecyclerView.Adapter<FavouriteAdapter.MyViewHolder>(){
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MyViewHolder {
-        val itemView = LayoutInflater.from(parent?.context)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        val itemView = LayoutInflater.from(parent.context)
                 .inflate(R.layout.row_custom_mainscreen_adapter, parent, false)
 
         return MyViewHolder(itemView)
@@ -30,20 +32,28 @@ class FavouriteAdapter(_songDetails: ArrayList<Songs>, _context: Context): Recyc
         }
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val songObject = songDetails?.get(position)
         holder?.trackTitle?.text = songObject?.songTitle
         holder?.trackArtist?.text = songObject?.artist
+        holder.songArtwork?.setImageResource(R.drawable.ic_song_note)
+        songObject?.songData?.let { path ->
+            runCatching {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(path)
+                retriever.embeddedPicture?.let { bytes ->
+                    holder.songArtwork?.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
+                }
+                retriever.release()
+            }
+        }
         holder?.contentHolder?.setOnClickListener({
-            if (SongPlayingFragment.Statified.mediaPlayer?.isPlaying as Boolean){
-                SongPlayingFragment.Statified.mediaPlayer?.stop()
-            }else{
-                val songPlayingFragment = SongPlayingFragment()
+            val songPlayingFragment = SongPlayingFragment()
                 var args = Bundle()
                 args.putString("songArtist", songObject?.artist)
                 args.putString("path", songObject?.songData)
                 args.putString("songTitle", songObject?.songTitle)
-                args.putInt("songId", songObject?.songID?.toInt() as Int)
+                args.putInt("songId", songObject?.songID?.toInt() ?: 0)
                 args.putInt("songPosition", position)
                 args.putParcelableArrayList("songData", songDetails)
                 songPlayingFragment.arguments = args
@@ -52,7 +62,6 @@ class FavouriteAdapter(_songDetails: ArrayList<Songs>, _context: Context): Recyc
                         .replace(R.id.details_fragment, songPlayingFragment)
                         .addToBackStack("SongPlayingFragmentFavourite")
                         .commit()
-            }
         })
     }
 
@@ -68,11 +77,13 @@ class FavouriteAdapter(_songDetails: ArrayList<Songs>, _context: Context): Recyc
         var trackTitle: TextView?=null
         var trackArtist: TextView?=null
         var contentHolder: RelativeLayout?=null
+        var songArtwork: ImageView?=null
 
         init {
             trackTitle=view.findViewById<TextView>(R.id.trackTitle)
             trackArtist=view.findViewById<TextView>(R.id.trackArtist)
             contentHolder=view.findViewById<RelativeLayout>(R.id.contentRow)
+            songArtwork=view.findViewById(R.id.songArtwork)
         }
 
     }
