@@ -1,7 +1,7 @@
 <RelativeLayout android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:background="@color/surface"
     android:clickable="true">
 
         <ImageView
@@ -11,7 +11,8 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="115dp"
-            android:background="@drawable/joey" />
+            android:src="@drawable/echo_launcher_foreground"
+            android:background="@color/surfaceMuted" />
 
         <TextView
             android:id="@+id/aboutDeveloper1"
@@ -20,8 +21,8 @@
             android:layout_below="@+id/joey"
             android:layout_centerHorizontal="true"
             android:textSize="12sp"
-            android:text="This app is made by Joey Tribbiani as"
-            android:textColor="#212121" />
+            android:text="Echo is a modern local music player"
+            android:textColor="@color/textPrimary" />
 
         <TextView
             android:id="@+id/aboutDeveloper2"
@@ -30,8 +31,8 @@
             android:layout_below="@+id/aboutDeveloper1"
             android:textSize="12sp"
             android:layout_centerHorizontal="true"
-            android:text="part of InternShala's Online Android"
-            android:textColor="#212121" />
+            android:text="Built for private, offline listening"
+            android:textColor="@color/textSecondary" />
 
         <TextView
             android:id="@+id/aboutDeveloper3"
@@ -40,8 +41,8 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/aboutDeveloper2"
             android:textSize="12sp"
-            android:text="Training Project"
-            android:textColor="#212121" />
+            android:text="Designed and maintained by Raktim Kalita"
+            android:textColor="@color/textSecondary" />
         <TextView
             android:id="@+id/appVersion"
             android:layout_width="wrap_content"
@@ -50,7 +51,7 @@
             android:layout_marginTop="7dp"
             android:layout_below="@+id/aboutDeveloper3"
             android:textSize="10sp"
-            android:text="App Version: 1.0"
-            android:textColor="#212121" />
+            android:text="Echo Music Player • Modernized edition"
+            android:textColor="@color/textSecondary" />
 </RelativeLayout>
 

@@ -55,8 +55,9 @@ class MainScreenFragment : Fragment() {
         nowPlayingBottomBar = view?.findViewById<RelativeLayout>(R.id.hiddenBarMainScreen)
         songTitle = view?.findViewById<TextView>(R.id.songTitleMainScreen)
         playPauseButton = view?.findViewById<ImageButton>(R.id.playPauseButton)
+        view?.findViewById<ImageButton>(R.id.miniPreviousButton)?.setOnClickListener { SongPlayingFragment().playPrevious(); refreshMiniArtwork() }
+        view?.findViewById<ImageButton>(R.id.miniNextButton)?.setOnClickListener { SongPlayingFragment.Staticated.playNext("PlayNextNormal"); refreshMiniArtwork() }
         recyclerView = view?.findViewById<RecyclerView>(R.id.contentMain)
-
         return view
 
     }
@@ -177,15 +178,21 @@ class MainScreenFragment : Fragment() {
         try {
             bottomBar_ClickHandler()
             songTitle?.setText(SongPlayingFragment.Statified.currentSongHelper?.songTitle)
+            songTitle?.isSelected = true
+            songTitle?.setHorizontallyScrolling(true)
+            SongPlayingFragment.Staticated.updateAlbumArt(SongPlayingFragment.Statified.currentSongHelper?.songPath)
+            SongPlayingFragment.Staticated.updateMiniArtwork(view?.findViewById(R.id.defaultMusic), SongPlayingFragment.Statified.currentSongHelper?.songPath)
             SongPlayingFragment.Statified.mediaPlayer?.setOnCompletionListener({
                 songTitle?.setText(SongPlayingFragment.Statified.currentSongHelper?.songTitle)
                 SongPlayingFragment.Staticated.onSongComplete()
             })
-            if (SongPlayingFragment.Statified.mediaPlayer?.isPlaying as Boolean){
-                nowPlayingBottomBar?.visibility = View.VISIBLE
-            }else{
-                nowPlayingBottomBar?.visibility = View.INVISIBLE
-            }
+            val hasCurrentSong = SongPlayingFragment.Statified.currentSongHelper?.songPath != null &&
+                    SongPlayingFragment.Statified.mediaPlayer != null
+            nowPlayingBottomBar?.visibility = if (hasCurrentSong) View.VISIBLE else View.INVISIBLE
+            playPauseButton?.setBackgroundResource(
+                if (SongPlayingFragment.Statified.mediaPlayer?.isPlaying == true) R.drawable.pause_icon
+                else R.drawable.play_icon
+            )
         }catch (e: Exception){
             e.printStackTrace()
         }
@@ -208,6 +215,9 @@ class MainScreenFragment : Fragment() {
                     .addToBackStack("SongPlayingFragment")
                     .commit()
         })
+        listOf(R.id.defaultMusic, R.id.nowPlaying, R.id.songTitleMainScreen).forEach { id ->
+            nowPlayingBottomBar?.findViewById<View>(id)?.setOnClickListener { nowPlayingBottomBar?.performClick() }
+        }
 
         playPauseButton?.setOnClickListener({
             if (SongPlayingFragment.Statified.mediaPlayer?.isPlaying as Boolean){
@@ -215,11 +225,17 @@ class MainScreenFragment : Fragment() {
                 trackPosition = SongPlayingFragment.Statified.mediaPlayer?.getCurrentPosition() as Int
                 playPauseButton?.setBackgroundResource(R.drawable.play_icon)
             }else{
-                SongPlayingFragment.Statified.mediaPlayer?.seekTo(trackPosition)
                 SongPlayingFragment.Statified.mediaPlayer?.start()
                 playPauseButton?.setBackgroundResource(R.drawable.pause_icon)
             }
         })
+    }
+
+    private fun refreshMiniArtwork() {
+        SongPlayingFragment.Staticated.updateMiniArtwork(view?.findViewById(R.id.defaultMusic), SongPlayingFragment.Statified.currentSongHelper?.songPath)
+                    songTitle?.text = SongPlayingFragment.Statified.currentSongHelper?.songTitle
+                    songTitle?.isSelected = true
+                    songTitle?.setHorizontallyScrolling(true)
     }
 
 }// Required empty public constructor

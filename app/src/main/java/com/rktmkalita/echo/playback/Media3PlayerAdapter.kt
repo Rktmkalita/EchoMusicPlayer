@@ -4,10 +4,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
+import com.rktmkalita.echo.Songs
 
 class Media3PlayerAdapter private constructor(context: Context) {
     private var controller: MediaController? = null
@@ -48,6 +50,23 @@ class Media3PlayerAdapter private constructor(context: Context) {
 
     fun setDataSource(context: Context?, uri: Uri) {
         enqueue { setMediaItem(MediaItem.fromUri(uri)) }
+    }
+
+    fun setQueue(songs: List<Songs>, startIndex: Int) {
+        val items = songs.map { song ->
+            MediaItem.Builder()
+                .setUri(song.songData)
+                .setMediaId(song.songID.toString())
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(song.songTitle)
+                        .setArtist(song.artist)
+                        .build()
+                )
+                .build()
+        }
+        if (items.isEmpty()) return
+        enqueue { setMediaItems(items, startIndex.coerceIn(0, items.lastIndex), 0L) }
     }
 
     fun setOnCompletionListener(listener: () -> Unit) {

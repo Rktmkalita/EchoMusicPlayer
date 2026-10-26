@@ -15,21 +15,15 @@
             android:id="@+id/contentMain">
         </androidx.recyclerview.widget.RecyclerView>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
+        <include
             android:id="@+id/hiddenBarMainScreen"
-            android:layout_alignParentBottom="true"
-            android:visibility="invisible"
-            android:background="@color/surfaceElevated">
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/playPauseButton"
-                android:background="@drawable/pause_icon"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="31dp"/>
+            layout="@layout/mini_player" />
+        <!--
+            <LinearLayout android:id="@+id/miniControls" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_alignParentEnd="true" android:gravity="center_vertical" android:orientation="horizontal">
+                <ImageButton android:id="@+id/miniPreviousButton" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/play_previous_icon" />
+                <ImageButton android:id="@+id/playPauseButton" android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/pause_icon" />
+                <ImageButton android:id="@+id/miniNextButton" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/play_next_icon" />
+            </LinearLayout>
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -46,25 +40,32 @@
                 android:text="Now Playing"
                 android:id="@+id/nowPlaying"
                 android:layout_toRightOf="@+id/defaultMusic"
+                android:layout_toStartOf="@id/miniControls"
+                android:layout_marginEnd="8dp"
                 android:textColor="@color/textSecondary"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="11dp"/>
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/songTitleMainScreen"
                 android:layout_below="@+id/nowPlaying"
-                android:ellipsize="end"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
                 android:maxLines="1"
-                android:maxWidth="160dp"
                 android:singleLine="true"
+                android:scrollHorizontally="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:text="..."
                 android:textColor="@color/textPrimary"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_alignLeft="@+id/nowPlaying"
-                android:layout_alignStart="@+id/nowPlaying"
+                android:layout_toRightOf="@id/defaultMusic"
+                android:layout_toStartOf="@id/miniControls"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="5dp"/>
-        </RelativeLayout>
+        </RelativeLayout> -->
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"

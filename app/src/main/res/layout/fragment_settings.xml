@@ -10,13 +10,14 @@
         android:layout_height="wrap_content"
         android:textColor="@color/textPrimary"
         android:layout_marginLeft="20dp"
-        android:text="Shake to change song"
-        android:id="@+id/shaketochange"
+        android:text="Playback settings"
+        android:id="@+id/playbackSettings"
         android:textSize="17sp"/>
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/switchShake"
+        android:id="@+id/unusedShakeSwitch"
+        android:visibility="gone"
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
         android:buttonTint="@color/colorAccent"/>
@@ -24,16 +25,34 @@
         android:layout_width="match_parent"
         android:layout_height="0.2dp"
         android:layout_margin="25dp"
-        android:layout_below="@+id/shaketochange"
+        android:layout_below="@+id/playbackSettings"
         android:background="@color/divider"/>
-    <Button
-        android:id="@+id/equalizerButton"
-        android:layout_width="match_parent"
+    <RadioGroup android:id="@+id/equalizerPresets" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/switchEqualizer" android:layout_marginStart="12dp" android:layout_marginTop="12dp" android:layout_marginEnd="12dp">
+        <RadioButton android:id="@+id/presetNormal" android:text="Normal" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetBass" android:text="Bass Boost" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetRock" android:text="Rock" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetPop" android:text="Pop" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetJazz" android:text="Jazz" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetClassical" android:text="Classical" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetVocal" android:text="Vocal" android:textColor="@color/textPrimary" />
+        <RadioButton android:id="@+id/presetCustom" android:text="Custom…" android:textColor="@color/textPrimary" />
+    </RadioGroup>
+    <Switch
+        android:id="@+id/switchEqualizer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/shaketochange"
-        android:layout_marginStart="16dp"
+        android:layout_below="@id/playbackSettings"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
+        android:buttonTint="@color/colorAccent" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playbackSettings"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="31dp"
         android:text="Equalizer"
-        android:textColor="@color/textPrimary" />
+        android:textColor="@color/textPrimary"
+        android:textSize="17sp" />
 </RelativeLayout>

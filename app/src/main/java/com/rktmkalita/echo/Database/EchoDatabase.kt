@@ -10,22 +10,28 @@ class EchoDatabase: SQLiteOpenHelper{
     var _songList = ArrayList<Songs>()
 
     object Staticated{
-        var DB_VERSION = 1
+        var DB_VERSION = 3
         val DB_NAME = "FavouriteDatabase"
         val TABLE_NAME = "FavouriteTable"
         val COLUMN_ID = "SongID"
         val COLUMN_SONG_TITLE = "SongTitle"
         val COLUMN_SONG_ARTIST = "SongArtist"
         val COLUMN_SONG_PATH = "SongPath"
+        val PLAYLIST_TABLE = "Playlists"
+        val PLAYLIST_SONG_TABLE = "PlaylistSongs"
     }
     override fun onCreate(sqliteDatabase: SQLiteDatabase?) {
         sqliteDatabase?.execSQL("CREATE TABLE " + Staticated.TABLE_NAME + "( " + Staticated.COLUMN_ID + " INTEGER," + Staticated.COLUMN_SONG_ARTIST + " STRING,"
                 + Staticated.COLUMN_SONG_TITLE + " STRING," + Staticated.COLUMN_SONG_PATH + " STRING);")
+        sqliteDatabase?.execSQL("CREATE TABLE ${Staticated.PLAYLIST_TABLE} (PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT, PlaylistName TEXT NOT NULL UNIQUE)")
+        sqliteDatabase?.execSQL("CREATE TABLE ${Staticated.PLAYLIST_SONG_TABLE} (PlaylistID INTEGER NOT NULL, SongID INTEGER NOT NULL, SongTitle TEXT, SongArtist TEXT, SongPath TEXT, PRIMARY KEY (PlaylistID, SongID))")
     }
 
     override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-        p0?.execSQL("DROP TABLE IF EXISTS " + Staticated.TABLE_NAME)
-        onCreate(p0)
+        p0?.execSQL("DROP TABLE IF EXISTS ${Staticated.PLAYLIST_SONG_TABLE}")
+        p0?.execSQL("DROP TABLE IF EXISTS ${Staticated.PLAYLIST_TABLE}")
+        p0?.execSQL("CREATE TABLE IF NOT EXISTS ${Staticated.PLAYLIST_TABLE} (PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT, PlaylistName TEXT NOT NULL UNIQUE)")
+        p0?.execSQL("CREATE TABLE IF NOT EXISTS ${Staticated.PLAYLIST_SONG_TABLE} (PlaylistID INTEGER NOT NULL, SongID INTEGER NOT NULL, SongTitle TEXT, SongArtist TEXT, SongPath TEXT, PRIMARY KEY (PlaylistID, SongID))")
     }
 
     constructor(context: Context?, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int) : super(context, name, factory, version)
@@ -96,5 +102,47 @@ class EchoDatabase: SQLiteOpenHelper{
         cSor.close()
         db.close()
         return counter
+    }
+
+    fun createPlaylist(name: String): Long {
+        val values = ContentValues().apply { put("PlaylistName", name.trim()) }
+        return writableDatabase.insertWithOnConflict(Staticated.PLAYLIST_TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE)
+    }
+
+    fun playlistNames(): ArrayList<String> {
+        val result = ArrayList<String>()
+        val cursor = readableDatabase.query(Staticated.PLAYLIST_TABLE, arrayOf("PlaylistName"), null, null, null, null, "PlaylistName COLLATE NOCASE")
+        cursor.use { while (it.moveToNext()) result.add(it.getString(0)) }
+        return result
+    }
+
+    fun addSongToPlaylist(playlistName: String, song: Songs) {
+        val db = writableDatabase
+        val playlist = db.query(Staticated.PLAYLIST_TABLE, arrayOf("PlaylistID"), "PlaylistName = ?", arrayOf(playlistName), null, null, null)
+        playlist.use {
+            if (it.moveToFirst()) {
+                ContentValues().apply {
+                    put("PlaylistID", it.getLong(0)); put("SongID", song.songID)
+                    put("SongTitle", song.songTitle); put("SongArtist", song.artist); put("SongPath", song.songData)
+                }.also { values -> db.insertWithOnConflict(Staticated.PLAYLIST_SONG_TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE) }
+            }
+        }
+    }
+
+    fun playlistSongs(playlistName: String): ArrayList<Songs> {
+        val result = ArrayList<Songs>()
+        val db = readableDatabase
+        val playlistCursor = db.query(Staticated.PLAYLIST_TABLE, arrayOf("PlaylistID"), "PlaylistName = ?", arrayOf(playlistName), null, null, null)
+        if (!playlistCursor.moveToFirst()) {
+            playlistCursor.close()
+            return result
+        }
+        val playlistId = playlistCursor.getLong(0)
+        playlistCursor.close()
+        val cursor = db.rawQuery("SELECT SongID, SongTitle, SongArtist, SongPath FROM ${Staticated.PLAYLIST_SONG_TABLE} WHERE PlaylistID = ? ORDER BY SongTitle COLLATE NOCASE", arrayOf(playlistId.toString()))
+        cursor.use {
+            while (it.moveToNext()) result.add(Songs(it.getLong(0), it.getString(1), it.getString(2), it.getString(3), 0))
+        }
+        return result
     }
 }

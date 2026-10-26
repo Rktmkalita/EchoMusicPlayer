@@ -21,6 +21,7 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import android.app.AlertDialog
 import com.cleveroad.audiovisualization.AudioVisualization
 import com.cleveroad.audiovisualization.DbmHandler
 import com.cleveroad.audiovisualization.GLAudioVisualizationView
@@ -167,6 +168,20 @@ class SongPlayingFragment : Fragment() {
             }
         }
 
+        fun updateMiniArtwork(imageView: ImageView?, path: String?) {
+            try {
+                if (path.isNullOrBlank()) return
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(path)
+                retriever.embeddedPicture?.let {
+                    imageView?.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(it, 0, it.size))
+                }
+                retriever.release()
+            } catch (_: RuntimeException) {
+                imageView?.setImageResource(R.drawable.now_playing_bar_eq_image)
+            }
+        }
+
         fun playNext(check: String){
             val songCount = Statified.fetchSongs?.size ?: return
             if (songCount == 0) return
@@ -213,15 +228,14 @@ class SongPlayingFragment : Fragment() {
     var mAccelaration: Float = 0f
     var mAccelarationCurrent: Float = 0f
     var mAccelarationLast: Float = 0f
+    var lastShakeAt: Long = 0L
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         var view = inflater!!.inflate(R.layout.fragment_song_playing, container,false)
-        view.post {
-            view.translationY = view.height.toFloat()
-            view.animate().translationY(0f).alpha(1f).setDuration(260L).start()
-        }
+        view.translationY = 0f
+        view.alpha = 1f
         setHasOptionsMenu(true)
         requireActivity().title = "Now Playing"
         Statified.seekbar = view?.findViewById(R.id.seekBar)
@@ -261,13 +275,7 @@ class SongPlayingFragment : Fragment() {
                 }
                 MotionEvent.ACTION_UP -> {
                     if (event.rawY - downY > 140f) {
-                    view.animate()
-                            .translationY(view.height.toFloat())
-                            .alpha(0f)
-                            .setDuration(280L)
-                            .setInterpolator(android.view.animation.DecelerateInterpolator())
-                            .withEndAction { parentFragmentManager.popBackStack() }
-                            .start()
+                        parentFragmentManager.popBackStack()
                     }
                     true
                 }
@@ -297,9 +305,6 @@ class SongPlayingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Statified.audioVisualitation?.onResume()
-        Statified.mSensorManager?.registerListener(Statified.mSensorListener
-                , Statified.mSensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-                , SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     override fun onDestroyView() {
@@ -314,7 +319,6 @@ class SongPlayingFragment : Fragment() {
         mAccelaration = 0.0f
         mAccelarationCurrent = SensorManager.GRAVITY_EARTH
         mAccelarationLast = SensorManager.GRAVITY_EARTH
-        bindShakeListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -395,7 +399,12 @@ class SongPlayingFragment : Fragment() {
             Statified.mediaPlayer = Media3PlayerAdapter.get(Statified.myActivity)
             Statified.mediaPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
             try {
-                Statified.mediaPlayer?.setDataSource(Statified.myActivity, Uri.parse(path))
+                val queue = Statified.fetchSongs
+                if (!queue.isNullOrEmpty()) {
+                    Statified.mediaPlayer?.setQueue(queue, Statified.currentPosition)
+                } else {
+                    Statified.mediaPlayer?.setDataSource(Statified.myActivity, Uri.parse(path))
+                }
                 Statified.mediaPlayer?.prepare()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -424,6 +433,14 @@ class SongPlayingFragment : Fragment() {
         }
         Statified.mediaPlayer?.setOnReadyListener {
             Statified.mediaPlayer?.let { Staticated.processInformation(it) }
+            Staticated.updateAlbumArt(Statified.currentSongHelper?.songPath)
+            Staticated.updateTextViews(
+                Statified.currentSongHelper?.songTitle ?: "Unknown",
+                Statified.currentSongHelper?.songArtist ?: "Unknown"
+            )
+            Statified.playPauseImageButton?.setBackgroundResource(
+                if (Statified.mediaPlayer?.isPlaying == true) R.drawable.pause_icon else R.drawable.play_icon
+            )
         }
         clickHandler()
         try {
@@ -527,6 +544,11 @@ class SongPlayingFragment : Fragment() {
                     Statified.loopImageButton?.setBackgroundResource(R.drawable.loop_white_icon)
                 }
                 playPrevious()
+                Statified.mediaPlayer?.let { player ->
+                    Statified.playPauseImageButton?.setBackgroundResource(
+                        if (player.isPlaying) R.drawable.pause_icon else R.drawable.play_icon
+                    )
+                }
         })
         Statified.loopImageButton?.setOnClickListener({
             var editorShuffle = Statified.myActivity?.getSharedPreferences(Staticated.MY_PREFS_SHUFFLE, Context.MODE_PRIVATE)?.edit()
@@ -560,6 +582,19 @@ class SongPlayingFragment : Fragment() {
                 Statified.playPauseImageButton?.setBackgroundResource(R.drawable.pause_icon)
             }
         })
+        view?.findViewById<ImageButton>(R.id.playlistAddButton)?.setOnClickListener {
+            val database = EchoDatabase(Statified.myActivity)
+            val playlists = database.playlistNames()
+            if (playlists.isEmpty()) {
+                Toast.makeText(Statified.myActivity, "Create a playlist in Playlists first", Toast.LENGTH_SHORT).show()
+            } else {
+                AlertDialog.Builder(Statified.myActivity).setTitle("Add to playlist")
+                    .setItems(playlists.toTypedArray()) { _, index ->
+                        val song = Statified.currentSongHelper
+                        if (song != null) database.addSongToPlaylist(playlists[index], Songs(song.songId ?: 0L, song.songTitle ?: "", song.songArtist ?: "", song.songPath ?: "", 0))
+                    }.show()
+            }
+        }
         Statified.rewind10ImageButton?.setOnClickListener {
             val player = Statified.mediaPlayer ?: return@setOnClickListener
             player.seekTo((player.getCurrentPosition() - 10_000).coerceAtLeast(0))
@@ -585,8 +620,10 @@ class SongPlayingFragment : Fragment() {
         var nextSong = Statified.fetchSongs?.get(Statified.currentPosition)
         Statified.currentSongHelper?.songTitle = nextSong?.songTitle
         Statified.currentSongHelper?.songPath = nextSong?.songData
+        Statified.currentSongHelper?.songArtist = nextSong?.artist
         Statified.currentSongHelper?.currentPosition = Statified.currentPosition
         Statified.currentSongHelper?.songId = nextSong?.songID as Long
+        Staticated.updateAlbumArt(nextSong?.songData)
 
         Staticated.updateTextViews(Statified.currentSongHelper?.songTitle as String, Statified.currentSongHelper?.songArtist as String)
 
@@ -623,11 +660,14 @@ class SongPlayingFragment : Fragment() {
                 val delta = mAccelarationCurrent - mAccelarationLast
                 mAccelaration = mAccelaration * 0.9f + delta
 
-                if (mAccelaration>12) {
+                if (mAccelaration > 8f) {
                     val prefs = Statified.myActivity?.getSharedPreferences(Statified.MY_PREFS_NAME, Context.MODE_PRIVATE)
                     val isAllowed = prefs?.getBoolean("feature", false)
-                    if (isAllowed as Boolean){
+                    val now = System.currentTimeMillis()
+                    if (isAllowed == true && now - lastShakeAt > 1200L){
+                        lastShakeAt = now
                         Staticated.playNext("PlayNextNormal")
+                        mAccelaration = 0f
                     }
                 }
             }

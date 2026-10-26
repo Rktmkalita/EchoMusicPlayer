@@ -24,9 +24,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:layout_below="@+id/appBarLayout"
-            class="com.rktmkalita.echo.fragments.MainScreenFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/details_fragment"/>

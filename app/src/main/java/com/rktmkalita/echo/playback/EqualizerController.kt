@@ -4,12 +4,16 @@ import android.media.audiofx.Equalizer
 
 object EqualizerController {
     private var equalizer: Equalizer? = null
+    private var enabled = false
 
-    fun attach(audioSessionId: Int) {
+    fun attach(context: android.content.Context, audioSessionId: Int) {
         if (audioSessionId == 0) return
+        val prefs = context.getSharedPreferences("AudioSettings", android.content.Context.MODE_PRIVATE)
+        enabled = prefs.getBoolean("enabled", false)
         runCatching {
             equalizer?.release()
-            equalizer = Equalizer(0, audioSessionId).apply { enabled = true }
+            equalizer = Equalizer(0, audioSessionId).apply { enabled = this@EqualizerController.enabled }
+            prefs.getString("preset", "Normal")?.let { preset(it) }
         }
     }
 
@@ -31,6 +35,11 @@ object EqualizerController {
             val count = minOf(effect.numberOfBands.toInt(), levels.size)
             for (index in 0 until count) effect.setBandLevel(index.toShort(), levels[index])
         }
+    }
+
+    fun setEnabled(value: Boolean) {
+        enabled = value
+        runCatching { equalizer?.enabled = value }
     }
 
     fun release() {

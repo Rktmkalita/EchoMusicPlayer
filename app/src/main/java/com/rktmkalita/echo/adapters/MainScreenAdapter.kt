@@ -21,7 +21,7 @@ import com.rktmkalita.echo.fragments.SongPlayingFragment
 /**
  * Created by R kalita on 10/07/2018.
  */
-class MainScreenAdapter(_songDetails: ArrayList<Songs>, _context: Context): RecyclerView.Adapter<MainScreenAdapter.MyViewHolder>(){
+open class MainScreenAdapter(_songDetails: ArrayList<Songs>, _context: Context): RecyclerView.Adapter<MainScreenAdapter.MyViewHolder>(){
     private val allSongDetails = ArrayList<Songs>(_songDetails)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView = LayoutInflater.from(parent.context)

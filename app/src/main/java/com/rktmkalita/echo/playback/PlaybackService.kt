@@ -21,7 +21,7 @@ class PlaybackService : MediaSessionService() {
             )
             .setHandleAudioBecomingNoisy(true)
             .build()
-        EqualizerController.attach(player.audioSessionId)
+        EqualizerController.attach(this, player.audioSessionId)
         mediaSession = MediaSession.Builder(this, player).build()
     }
 

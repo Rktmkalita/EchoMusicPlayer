@@ -14,6 +14,7 @@ import com.rktmkalita.echo.fragments.AboutUsFragment
 import com.rktmkalita.echo.fragments.FavouriteFragment
 import com.rktmkalita.echo.fragments.MainScreenFragment
 import com.rktmkalita.echo.fragments.SettingsFragment
+import com.rktmkalita.echo.fragments.PlaylistFragment
 
 /**
  * Created by R kalita on 02/07/2018.
@@ -42,7 +43,7 @@ class NavigationDrawerAdapter(_contentList: ArrayList<String>, _getImages: IntAr
     }
 
     override fun onBindViewHolder(holder: NavViewHolder, position: Int) {
-        holder?.icon_GET?.setBackgroundResource(getImage?.get(position) as Int)
+        holder?.icon_GET?.setImageResource(getImage?.get(position) as Int)
         holder?.text_GET?.setText(contentList?.get(position))
         holder?.contentHolder?.setOnClickListener({
 
@@ -59,12 +60,16 @@ class NavigationDrawerAdapter(_contentList: ArrayList<String>, _getImages: IntAr
                         .replace(R.id.details_fragment, favouriteFragment)
                         .commit()
             }else if (position == 2){
+                val playlistFragment = PlaylistFragment()
+                (mContext as MainActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.details_fragment, playlistFragment).commit()
+            }else if (position == 3){
                 val settingsFragment = SettingsFragment()
                 (mContext as MainActivity).supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.details_fragment, settingsFragment)
                         .commit()
-            }else{
+            }else if (position == 4){
                 val aboutUsFragment = AboutUsFragment()
                 (mContext as MainActivity).supportFragmentManager
                         .beginTransaction()

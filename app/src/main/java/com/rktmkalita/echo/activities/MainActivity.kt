@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity(){
     var trackNotificationBuilder: Notification?=null
     var navigationDrawerIconsList: ArrayList<String> = arrayListOf()
     var images_for_navdrawer = intArrayOf(R.drawable.navigation_allsongs, R.drawable.navigation_favorites,
-            R.drawable.navigation_settings, R.drawable.navigation_aboutus)
+            R.drawable.navigation_playlists, R.drawable.navigation_settings, R.drawable.navigation_aboutus)
     object Statified{
         var drawerLayout: DrawerLayout?=null
         var notificationManager: NotificationManager?=null
@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity(){
 
         navigationDrawerIconsList.add("All Songs")
         navigationDrawerIconsList.add("Favourites")
+        navigationDrawerIconsList.add("Playlists")
         navigationDrawerIconsList.add("Settings")
         navigationDrawerIconsList.add("About Us")
 

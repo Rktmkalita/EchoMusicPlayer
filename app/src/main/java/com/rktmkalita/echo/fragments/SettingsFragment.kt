@@ -10,7 +10,7 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
-import android.widget.Button
+import android.widget.RadioGroup
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.app.AlertDialog
@@ -24,7 +24,7 @@ import com.rktmkalita.echo.R
 class SettingsFragment : Fragment() {
 
     var myActivity: Activity?=null
-    var shakeSwitch: Switch?=null
+    var equalizerSwitch: Switch?=null
     object Statified{
         var MY_PREFS_NAME = "ShakeFeature"
     }
@@ -33,8 +33,30 @@ class SettingsFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_settings,container,false)
         requireActivity().title = "Settings"
-        shakeSwitch = view?.findViewById(R.id.switchShake)
-        view?.findViewById<Button>(R.id.equalizerButton)?.setOnClickListener { showEqualizerDialog() }
+        equalizerSwitch = view?.findViewById(R.id.switchEqualizer)
+        val equalizerPresets = view?.findViewById<RadioGroup>(R.id.equalizerPresets)
+        val prefs = requireContext().getSharedPreferences("AudioSettings", Context.MODE_PRIVATE)
+        equalizerSwitch?.isChecked = prefs.getBoolean("enabled", false)
+        EqualizerController.setEnabled(equalizerSwitch?.isChecked == true)
+        val savedPreset = prefs.getString("preset", "Normal")
+        if (equalizerSwitch?.isChecked == true && savedPreset != "Custom") {
+            EqualizerController.preset(savedPreset ?: "Normal")
+        }
+        equalizerPresets?.visibility = if (equalizerSwitch?.isChecked == true) View.VISIBLE else View.GONE
+        val presetIds = mapOf("Normal" to R.id.presetNormal, "Bass Boost" to R.id.presetBass, "Rock" to R.id.presetRock, "Pop" to R.id.presetPop, "Jazz" to R.id.presetJazz, "Classical" to R.id.presetClassical, "Vocal" to R.id.presetVocal, "Custom" to R.id.presetCustom)
+        presetIds[savedPreset]?.let { equalizerPresets?.check(it) }
+        equalizerSwitch?.setOnCheckedChangeListener { _, enabled ->
+            prefs.edit().putBoolean("enabled", enabled).apply()
+            EqualizerController.setEnabled(enabled)
+            equalizerPresets?.visibility = if (enabled) View.VISIBLE else View.GONE
+        }
+        equalizerPresets?.setOnCheckedChangeListener { _, checkedId ->
+            val selected = presetIds.entries.firstOrNull { it.value == checkedId }?.key ?: return@setOnCheckedChangeListener
+            if (selected == "Custom") showCustomEqualizer() else {
+                EqualizerController.preset(selected)
+                prefs.edit().putString("preset", selected).apply()
+            }
+        }
         return view
     }
 
@@ -43,7 +65,11 @@ class SettingsFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle("Equalizer preset")
             .setItems(presets) { _, which ->
-                if (presets[which] == "Custom") showCustomEqualizer() else EqualizerController.preset(presets[which])
+                if (presets[which] == "Custom") showCustomEqualizer() else {
+                    EqualizerController.preset(presets[which])
+                    requireContext().getSharedPreferences("AudioSettings", Context.MODE_PRIVATE).edit()
+                        .putString("preset", presets[which]).apply()
+                }
             }
             .setNegativeButton("Close", null)
             .show()
@@ -51,13 +77,17 @@ class SettingsFragment : Fragment() {
 
     private fun showCustomEqualizer() {
         val layout = LinearLayout(requireContext()).apply { orientation = LinearLayout.VERTICAL; setPadding(24, 8, 24, 8) }
-        val bars = Array(5) { SeekBar(requireContext()).apply { max = 30; progress = 15; minimumHeight = 48 } }
+        val prefs = requireContext().getSharedPreferences("AudioSettings", Context.MODE_PRIVATE)
+        val saved = prefs.getString("custom", "0,0,0,0,0")!!.split(",").map { it.toIntOrNull() ?: 0 }
+        val bars = Array(5) { index -> SeekBar(requireContext()).apply { max = 30; progress = (saved[index] / 100 + 15).coerceIn(0, 30); minimumHeight = 48 } }
         bars.forEach { layout.addView(it) }
         AlertDialog.Builder(requireContext())
             .setTitle("Custom equalizer")
             .setView(layout)
             .setPositiveButton("Apply") { _, _ ->
-                EqualizerController.applyLevels(ShortArray(5) { ((bars[it].progress - 15) * 100).toShort() })
+                val levels = ShortArray(5) { ((bars[it].progress - 15) * 100).toShort() }
+                EqualizerController.applyLevels(levels)
+                prefs.edit().putString("preset", "Custom").putString("custom", levels.joinToString(",")).apply()
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -80,20 +110,6 @@ class SettingsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val prefs = myActivity?.getSharedPreferences(Statified.MY_PREFS_NAME, Context.MODE_PRIVATE)
-        shakeSwitch?.isChecked = prefs?.getBoolean("feature", false) ?: false
-        shakeSwitch?.setOnCheckedChangeListener({compoundButton, b ->
-            if (b){
-                val editor = myActivity?.getSharedPreferences(Statified.MY_PREFS_NAME,Context.MODE_PRIVATE)?.edit()
-                editor?.putBoolean("feature",true)
-                editor?.apply()
-            }else{
-                val editor = myActivity?.getSharedPreferences(Statified.MY_PREFS_NAME,Context.MODE_PRIVATE)?.edit()
-                editor?.putBoolean("feature",false)
-                editor?.apply()
-            }
-
-        })
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
